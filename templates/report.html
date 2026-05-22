@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+{% block title %}รายงาน - Smart Building{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h4><i class="fas fa-file-alt me-2 text-primary"></i>รายงานสรุป</h4>
+    <p class="text-muted mb-0">สรุปข้อมูลการซ่อมบำรุง</p>
+</div>
+
+<div class="row g-4">
+    <!-- สถานะงาน -->
+    <div class="col-md-4">
+        <div class="card h-100">
+            <div class="card-header bg-white py-3">
+                <h6 class="mb-0 fw-bold"><i class="fas fa-tasks me-2 text-primary"></i>สรุปสถานะงาน</h6>
+            </div>
+            <div class="card-body">
+                {% for row in status_summary %}
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <span>
+                        {% if row.status == 'เสร็จสิ้น' %}
+                            <span class="badge bg-success me-2">✓</span>
+                        {% elif row.status == 'กำลังดำเนินการ' %}
+                            <span class="badge bg-primary me-2">⟳</span>
+                        {% else %}
+                            <span class="badge bg-warning text-dark me-2">!</span>
+                        {% endif %}
+                        {{ row.status }}
+                    </span>
+                    <strong>{{ row.count }} งาน</strong>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <!-- ค่าใช้จ่ายรายเดือน -->
+    <div class="col-md-8">
+        <div class="card h-100">
+            <div class="card-header bg-white py-3">
+                <h6 class="mb-0 fw-bold"><i class="fas fa-chart-bar me-2 text-primary"></i>ค่าซ่อมรายเดือน (บาท)</h6>
+            </div>
+            <div class="card-body">
+                {% for row in cost_by_month %}
+                <div class="mb-2">
+                    <div class="d-flex justify-content-between mb-1">
+                        <small>{{ row.month }}</small>
+                        <small class="fw-semibold text-success">฿{{ "%.0f"|format(row.total) }}</small>
+                    </div>
+                    <div class="progress" style="height:8px">
+                        {% set max_cost = cost_by_month[0].total if cost_by_month else 1 %}
+                        <div class="progress-bar bg-primary" style="width:{{ (row.total / max_cost * 100)|int }}%"></div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <!-- อุปกรณ์ซ่อมบ่อย -->
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header bg-white py-3">
+                <h6 class="mb-0 fw-bold"><i class="fas fa-wrench me-2 text-primary"></i>อุปกรณ์ที่ซ่อมบ่อยที่สุด (Top 5)</h6>
+            </div>
+            <div class="card-body p-0">
+                <table class="table table-hover mb-0">
+                    <thead>
+                        <tr>
+                            <th class="ps-3">#</th>
+                            <th>อุปกรณ์</th>
+                            <th>จำนวนครั้ง</th>
+                            <th>ค่าซ่อมรวม</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for eq in top_equipment %}
+                        <tr>
+                            <td class="ps-3">{{ loop.index }}</td>
+                            <td class="fw-semibold">{{ eq.name }}</td>
+                            <td><span class="badge bg-secondary">{{ eq.repairs }} ครั้ง</span></td>
+                            <td class="text-success fw-semibold">฿{{ "%.0f"|format(eq.total_cost or 0) }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

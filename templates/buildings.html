@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+{% block title %}อาคาร/ห้อง - Smart Building{% endblock %}
+
+{% block content %}
+<div class="page-header d-flex justify-content-between align-items-center">
+    <div>
+        <h4><i class="fas fa-city me-2 text-primary"></i>อาคารและห้อง</h4>
+        <p class="text-muted mb-0">รายการอาคาร ห้อง และเจ้าของ/ผู้เช่าทั้งหมด</p>
+    </div>
+    <a href="{{ url_for('owner_add') }}" class="btn btn-primary">
+        <i class="fas fa-user-plus me-1"></i> เพิ่มเจ้าของ/ผู้เช่า
+    </a>
+</div>
+
+{% for building in buildings %}
+{% set b_rooms = rooms_with_owners | selectattr('bid', 'equalto', building.id) | list %}
+<div class="card mb-4">
+    <div class="card-header bg-white py-3 d-flex align-items-center">
+        <div class="rounded-circle d-flex align-items-center justify-content-center me-3"
+             style="width:42px;height:42px;background:linear-gradient(135deg,#6366f1,#8b5cf6);flex-shrink:0">
+            <i class="fas fa-building text-white"></i>
+        </div>
+        <div>
+            <h6 class="mb-0 fw-bold">{{ building.name }}</h6>
+            <small class="text-muted">{{ building.address }} &nbsp;|&nbsp; {{ building.floors }} ชั้น</small>
+        </div>
+        <span class="ms-auto badge bg-primary fs-6 px-3">{{ building.room_count }} ห้อง</span>
+    </div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead>
+                    <tr>
+                        <th class="ps-4">ห้อง</th>
+                        <th>ชั้น</th>
+                        <th>ชื่อเจ้าของ / ผู้เช่า</th>
+                        <th>เบอร์โทร</th>
+                        <th>ประเภท</th>
+                        <th>เข้าอยู่วันที่</th>
+                        <th>จัดการ</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for room in b_rooms %}
+                    <tr>
+                        <td class="ps-4 fw-semibold">{{ room.room_number }}</td>
+                        <td>{{ room.floor }}</td>
+                        <td>
+                            {% if room.owner_name %}
+                                <i class="fas fa-user me-1 text-muted" style="font-size:.8rem"></i>{{ room.owner_name }}
+                            {% else %}
+                                <span class="text-muted fst-italic">ยังไม่มีข้อมูล</span>
+                            {% endif %}
+                        </td>
+                        <td><small>{{ room.owner_phone or '-' }}</small></td>
+                        <td>
+                            {% if room.owner_type == 'เจ้าของ' %}
+                                <span class="badge bg-success">{{ room.owner_type }}</span>
+                            {% elif room.owner_type == 'ผู้เช่า' %}
+                                <span class="badge bg-info text-dark">{{ room.owner_type }}</span>
+                            {% else %}
+                                <span class="text-muted">-</span>
+                            {% endif %}
+                        </td>
+                        <td><small>{{ room.move_in_date or '-' }}</small></td>
+                        <td>
+                            {% if room.owner_name %}
+                                <a href="{{ url_for('owner_add') }}" class="btn btn-sm btn-outline-secondary">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                            {% else %}
+                                <a href="{{ url_for('owner_add') }}" class="btn btn-sm btn-outline-primary">
+                                    <i class="fas fa-plus"></i>
+                                </a>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr><td colspan="9" class="text-center text-muted py-3">ไม่มีข้อมูลห้อง</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endfor %}
+{% endblock %}

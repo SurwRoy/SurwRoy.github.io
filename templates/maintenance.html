@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+{% block title %}บันทึกซ่อมบำรุง - Smart Building{% endblock %}
+
+{% block content %}
+<div class="page-header d-flex justify-content-between align-items-center">
+    <div>
+        <h4><i class="fas fa-clipboard-list me-2 text-primary"></i>บันทึกการซ่อมบำรุง</h4>
+        <p class="text-muted mb-0">ประวัติและสถานะการซ่อมบำรุงทั้งหมด</p>
+    </div>
+    <a href="{{ url_for('maintenance_add') }}" class="btn btn-primary">
+        <i class="fas fa-plus me-1"></i> เพิ่มบันทึก
+    </a>
+</div>
+
+<div class="card">
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead>
+                    <tr>
+                        <th class="ps-3">#</th>
+                        <th>อุปกรณ์</th>
+                        <th>ห้อง/อาคาร</th>
+                        <th>ปัญหา</th>
+                        <th>ช่างเทคนิค</th>
+                        <th>วันที่แจ้ง</th>
+                        <th>ค่าใช้จ่าย</th>
+                        <th>ความสำคัญ</th>
+                        <th>สถานะ</th>
+                        <th>จัดการ</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for log in logs %}
+                    <tr>
+                        <td class="ps-3 text-muted">{{ log.id }}</td>
+                        <td class="fw-semibold">{{ log.equipment_name }}</td>
+                        <td><small>{{ log.room_number }} / {{ log.building_name }}</small></td>
+                        <td><small>{{ log.issue_description[:35] }}{% if log.issue_description|length > 35 %}...{% endif %}</small></td>
+                        <td><small>{{ log.tech_name or '-' }}</small></td>
+                        <td><small>{{ log.report_date }}</small></td>
+                        <td>
+                            {% if log.cost > 0 %}
+                                <small class="text-success fw-semibold">฿{{ "%.0f"|format(log.cost) }}</small>
+                            {% else %}
+                                <small class="text-muted">-</small>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if log.priority == 'ด่วนมาก' %}
+                                <span class="badge bg-danger">{{ log.priority }}</span>
+                            {% elif log.priority == 'ด่วน' %}
+                                <span class="badge bg-warning text-dark">{{ log.priority }}</span>
+                            {% else %}
+                                <span class="badge bg-secondary">{{ log.priority }}</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if log.status == 'เสร็จสิ้น' %}
+                                <span class="badge bg-success">{{ log.status }}</span>
+                            {% elif log.status == 'กำลังดำเนินการ' %}
+                                <span class="badge bg-primary">{{ log.status }}</span>
+                            {% else %}
+                                <span class="badge bg-warning text-dark">{{ log.status }}</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <a href="{{ url_for('maintenance_edit', id=log.id) }}" class="btn btn-sm btn-outline-primary me-1">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                            <form method="POST" action="{{ url_for('maintenance_delete', id=log.id) }}" style="display:inline"
+                                  onsubmit="return confirm('ลบบันทึกนี้?')">
+                                <button class="btn btn-sm btn-outline-danger"><i class="fas fa-trash"></i></button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

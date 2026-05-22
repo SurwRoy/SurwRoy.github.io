@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+{% block title %}{{ 'แก้ไข' if log else 'เพิ่ม' }}บันทึกซ่อม{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h4><i class="fas fa-clipboard-list me-2 text-primary"></i>{{ 'แก้ไข' if log else 'เพิ่ม' }}บันทึกการซ่อมบำรุง</h4>
+</div>
+
+<div class="card" style="max-width:700px">
+    <div class="card-body">
+        <form method="POST">
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label class="form-label fw-semibold">อุปกรณ์ <span class="text-danger">*</span></label>
+                    <select name="equipment_id" class="form-select" required>
+                        {% for eq in equipment %}
+                        <option value="{{ eq.id }}" {{ 'selected' if log and log.equipment_id == eq.id }}>
+                            {{ eq.name }} ({{ eq.building_name }}-{{ eq.room_number }})
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label fw-semibold">ช่างเทคนิค</label>
+                    <select name="technician_id" class="form-select">
+                        <option value="">-- ยังไม่มอบหมาย --</option>
+                        {% for t in technicians %}
+                        <option value="{{ t.id }}" {{ 'selected' if log and log.technician_id == t.id }}>
+                            {{ t.name }} ({{ t.specialization }})
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-12">
+                    <label class="form-label fw-semibold">ปัญหา/อาการ <span class="text-danger">*</span></label>
+                    <textarea name="issue_description" class="form-control" rows="2" required>{{ log.issue_description if log else '' }}</textarea>
+                </div>
+                <div class="col-12">
+                    <label class="form-label fw-semibold">การดำเนินการ</label>
+                    <textarea name="action_taken" class="form-control" rows="2">{{ log.action_taken if log else '' }}</textarea>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label fw-semibold">วันที่แจ้ง <span class="text-danger">*</span></label>
+                    <input type="date" name="report_date" class="form-control"
+                           value="{{ log.report_date if log else '' }}" required>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label fw-semibold">วันที่เสร็จ</label>
+                    <input type="date" name="completed_date" class="form-control"
+                           value="{{ log.completed_date if log else '' }}">
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label fw-semibold">ค่าใช้จ่าย (บาท)</label>
+                    <input type="number" name="cost" class="form-control" min="0" step="0.01"
+                           value="{{ log.cost if log else '0' }}">
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label fw-semibold">ความสำคัญ</label>
+                    <select name="priority" class="form-select">
+                        {% for p in ['ปกติ','ด่วน','ด่วนมาก'] %}
+                        <option value="{{ p }}" {{ 'selected' if log and log.priority == p }}>{{ p }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label fw-semibold">สถานะ</label>
+                    <select name="status" class="form-select">
+                        {% for s in ['รอดำเนินการ','กำลังดำเนินการ','เสร็จสิ้น'] %}
+                        <option value="{{ s }}" {{ 'selected' if log and log.status == s }}>{{ s }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+            <div class="mt-4 d-flex gap-2">
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-save me-1"></i> บันทึก
+                </button>
+                <a href="{{ url_for('maintenance_list') }}" class="btn btn-outline-secondary">ยกเลิก</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

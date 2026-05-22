@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+{% block title %}{{ 'แก้ไข' if equipment else 'เพิ่ม' }}อุปกรณ์{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h4><i class="fas fa-tools me-2 text-primary"></i>{{ 'แก้ไข' if equipment else 'เพิ่ม' }}อุปกรณ์</h4>
+</div>
+
+<div class="card" style="max-width:700px">
+    <div class="card-body">
+        <form method="POST">
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label class="form-label fw-semibold">ชื่ออุปกรณ์ <span class="text-danger">*</span></label>
+                    <input type="text" name="name" class="form-control"
+                           value="{{ equipment.name if equipment else '' }}" required>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label fw-semibold">ประเภท</label>
+                    <select name="equipment_type" class="form-select">
+                        {% for t in ['ระบบน้ำ','ไฟฟ้า','IT','ความปลอดภัย','งานทั่วไป'] %}
+                        <option value="{{ t }}" {{ 'selected' if equipment and equipment.equipment_type == t }}>{{ t }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label fw-semibold">ยี่ห้อ</label>
+                    <input type="text" name="brand" class="form-control"
+                           value="{{ equipment.brand if equipment else '' }}">
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label fw-semibold">รุ่น</label>
+                    <input type="text" name="model" class="form-control"
+                           value="{{ equipment.model if equipment else '' }}">
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label fw-semibold">Serial Number</label>
+                    <input type="text" name="serial_number" class="form-control"
+                           value="{{ equipment.serial_number if equipment else '' }}">
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label fw-semibold">ห้อง <span class="text-danger">*</span></label>
+                    <select name="room_id" class="form-select" required>
+                        {% for r in rooms %}
+                        <option value="{{ r.id }}" {{ 'selected' if equipment and equipment.room_id == r.id }}>
+                            {{ r.building_name }} - ห้อง {{ r.room_number }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label fw-semibold">วันที่ติดตั้ง</label>
+                    <input type="date" name="install_date" class="form-control"
+                           value="{{ equipment.install_date if equipment else '' }}">
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label fw-semibold">หมดประกัน</label>
+                    <input type="date" name="warranty_expire" class="form-control"
+                           value="{{ equipment.warranty_expire if equipment else '' }}">
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label fw-semibold">สถานะ</label>
+                    <select name="status" class="form-select">
+                        {% for s in ['ปกติ','ชำรุด','ซ่อมอยู่','รอเปลี่ยน'] %}
+                        <option value="{{ s }}" {{ 'selected' if equipment and equipment.status == s }}>{{ s }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+            <div class="mt-4 d-flex gap-2">
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-save me-1"></i> บันทึก
+                </button>
+                <a href="{{ url_for('equipment_list') }}" class="btn btn-outline-secondary">ยกเลิก</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
